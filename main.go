@@ -59,10 +59,6 @@ func OneTask(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(todo)
 }
 
-func AddTask(w http.ResponseWriter, r *http.Request) {
-
-}
-
 func main() {
 	var err error
 
@@ -75,7 +71,6 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/todo", ShowTask).Methods("GET")
 	router.HandleFunc("/todo/one", OneTask).Methods("GET")
-	router.HandleFunc("/todo/add", AddTask).Methods("POST")
 
 	http.ListenAndServe(":8000", router)
 }
