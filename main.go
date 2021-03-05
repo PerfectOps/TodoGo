@@ -20,7 +20,7 @@ type Todo struct {
 	Datetime_end   string `json:"datetime_end"`
 }
 
-// DataTask Data that will be added to the table
+// DataTasks Data that will be added to the table
 var DataTasks = Todo{Task: "five task", Datetime_start: "2021-03-11", Datetime_end: "2021-03-12"}
 
 // ShowTask function show all tasks
@@ -65,13 +65,6 @@ func OneTask(w http.ResponseWriter, r *http.Request) {
 // AddTask added data in table
 func AddTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	// DataTask := Todo{}
-
-	// DataTask.Task = r.FormValue(DataTasks.Task)
-	// DataTask.Datetime_start = r.FormValue(DataTasks.Datetime_start)
-	// DataTask.Datetime_end = r.FormValue(DataTasks.Datetime_end)
-	// output, err := json.Marshal(DataTask)
-	// fmt.Println(string(output))
 
 	result, err := db.Exec(`INSERT INTO todo (task, datetime_start, datetime_end) VALUES ($1, $2, $3)`, &DataTasks.Task, &DataTasks.Datetime_start, &DataTasks.Datetime_end)
 	if err != nil {
