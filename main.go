@@ -13,14 +13,17 @@ import (
 
 var db *sql.DB
 
-// struct model Todo of db
+// Todo struct model Todo of db
 type Todo struct {
 	Task           string `json:"task"`
 	Datetime_start string `json:"datetime_start"`
 	Datetime_end   string `json:"datetime_end"`
 }
 
-// function show all tasks
+// DataTask Data that will be added to the table
+//var DataTask = Todo{Task: "five task", Datetime_start: "2021-03-11", Datetime_end: "2021-03-12"}
+
+// ShowTask function show all tasks
 func ShowTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var todo []Todo
@@ -43,20 +46,39 @@ func ShowTask(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(todo)
 }
 
-// show one task on a given time range in URL
+// OneTask show one task on a given time range in URL
 func OneTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	var todo Todo
 	dateOne := r.URL.Query().Get("dateOne")
 	dateTwo := r.URL.Query().Get("dateTwo")
 	// read value from URL. Example: localhost:8000/todo/one?dateOne='2021-03-02'&dateTwo='2021-03-03'
-	result := db.QueryRow(`SELECT datetime_start, datetime_end FROM todo 
+	result := db.QueryRow(`SELECT task, datetime_start, datetime_end FROM todo 
 						WHERE datetime_start BETWEEN $1 and $2 OR datetime_end BETWEEN $1 and $2`, dateOne, dateTwo)
-	err := result.Scan(&todo.Datetime_start, &todo.Datetime_end)
+	err := result.Scan(&todo.Task, &todo.Datetime_start, &todo.Datetime_end)
 	if err != nil {
 		panic(err.Error())
 	}
 	json.NewEncoder(w).Encode(todo)
+}
+
+// AddTask added data in table
+func AddTask(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	DataTask := Todo{}
+
+	DataTask.Task = r.FormValue("five task")
+	DataTask.Datetime_start = r.FormValue("2021-03-11")
+	DataTask.Datetime_end = r.FormValue("2021-03-12")
+	output, err := json.Marshal(DataTask)
+	fmt.Println(string(output))
+
+	result, err := db.Exec(`INSERT INTO todo (task, datetime_start, datetime_end) VALUES ($1, $2, $3)`, DataTask.Task, DataTask.Datetime_start, DataTask.Datetime_end)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	json.NewEncoder(w).Encode(result)
 }
 
 func main() {
@@ -71,6 +93,6 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/todo", ShowTask).Methods("GET")
 	router.HandleFunc("/todo/one", OneTask).Methods("GET")
-
+	router.HandleFunc("/todo/add", AddTask).Methods("POST")
 	http.ListenAndServe(":8000", router)
 }
