@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/gorilla/mux"
 
@@ -63,19 +62,31 @@ func OneTask(w http.ResponseWriter, r *http.Request) {
 // AddTask added data in table
 func AddTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	DataTask := Todo{}
 
-	DataTask.Task = r.FormValue("task")
-	DataTask.Datetime_start = r.FormValue("datetime_start")
-	DataTask.Datetime_end = r.FormValue("datetime_end")
-	output, err := json.Marshal(DataTask)
-	fmt.Println(string(output))
+	// err := r.ParseForm()
+	// if err != nil {
+	// 	panic(err.Error())
+	// }
+	// fmt.Println(r.ParseForm())
 
-	start, _ := time.Parse("2006-01-02", DataTask.Datetime_start)
-	end, _ := time.Parse("2006-01-02", DataTask.Datetime_end)
+	var DataTask Todo
+
+	err := json.NewDecoder(r.Body).Decode(&DataTask)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// DataTask.Task = r.FormValue("task")
+	// DataTask.Datetime_start = r.FormValue("datetime_start")
+	// DataTask.Datetime_end = r.FormValue("datetime_end")
+	// output, err := json.Marshal(DataTask)
+	// fmt.Println(string(output))
+
+	// start, _ := time.Parse(time.RFC3339, DataTask.Datetime_start)
+	// end, _ := time.Parse(time.RFC3339, DataTask.Datetime_end)
 
 	result, err := db.Exec(`INSERT INTO todo (task, datetime_start, datetime_end) VALUES ($1, $2, $3)`,
-		&DataTask.Task, &start, &end)
+		&DataTask.Task, &DataTask.Datetime_start, &DataTask.Datetime_end)
 	if err != nil {
 		panic(err.Error())
 	}
