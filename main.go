@@ -63,27 +63,12 @@ func OneTask(w http.ResponseWriter, r *http.Request) {
 func AddTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	// err := r.ParseForm()
-	// if err != nil {
-	// 	panic(err.Error())
-	// }
-	// fmt.Println(r.ParseForm())
-
 	var DataTask Todo
 
 	err := json.NewDecoder(r.Body).Decode(&DataTask)
 	if err != nil {
 		panic(err.Error())
 	}
-
-	// DataTask.Task = r.FormValue("task")
-	// DataTask.Datetime_start = r.FormValue("datetime_start")
-	// DataTask.Datetime_end = r.FormValue("datetime_end")
-	// output, err := json.Marshal(DataTask)
-	// fmt.Println(string(output))
-
-	// start, _ := time.Parse(time.RFC3339, DataTask.Datetime_start)
-	// end, _ := time.Parse(time.RFC3339, DataTask.Datetime_end)
 
 	result, err := db.Exec(`INSERT INTO todo (task, datetime_start, datetime_end) VALUES ($1, $2, $3)`,
 		&DataTask.Task, &DataTask.Datetime_start, &DataTask.Datetime_end)
